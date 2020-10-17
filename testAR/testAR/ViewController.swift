@@ -22,11 +22,6 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         // Show statistics such as fps and timing information
         sceneView.showsStatistics = true
         
-        // Create a new scene
-        let scene = SCNScene(named: "art.scnassets/ship.scn")!
-        
-        // Set the scene to the view
-        sceneView.scene = scene
         
         // 特徴点を描画
          sceneView.debugOptions = [ARSCNDebugOptions.showFeaturePoints]
@@ -99,6 +94,17 @@ class ViewController: UIViewController, ARSCNViewDelegate {
          planeNode.geometry = geometry
          planeNode.transform = SCNMatrix4MakeRotation(-Float.pi / 2.0, 1,
         0, 0)
+        
+        planeNode.physicsBody = SCNPhysicsBody(type: .dynamic, shape:
+       nil)
+       
+       // PhysicsBody のパラメータ設定
+        planeNode.physicsBody?.mass = 1.0
+        planeNode.physicsBody?.friction = 1.5
+        planeNode.physicsBody?.rollingFriction = 1.0
+        planeNode.physicsBody?.damping = 0.5
+        planeNode.physicsBody?.angularDamping = 0.5
+        planeNode.physicsBody?.isAffectedByGravity = false
 
          // 検出したアンカーに対応するノードに子ノードとして持たせる
          node.addChildNode(planeNode)
@@ -118,6 +124,8 @@ class ViewController: UIViewController, ARSCNViewDelegate {
           planeGeometory.width = CGFloat(planeAnchor.extent.x)
           planeGeometory.height = CGFloat(planeAnchor.extent.z)
           geometryPlaneNode.simdPosition = float3(planeAnchor.center.x,0,planeAnchor.center.z)
+            
+          geometryPlaneNode.physicsBody = SCNPhysicsBody(type: .kinematic, shape: SCNPhysicsShape(geometry: planeGeometory,options: nil))
          }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event:

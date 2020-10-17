@@ -62,9 +62,18 @@ class ViewController: UIViewController, ARSCNViewDelegate {
          spherelNode.physicsBody?.damping = 0.5
          spherelNode.physicsBody?.angularDamping = 0.5
          spherelNode.physicsBody?.isAffectedByGravity = true
+        
+        
+        guard let camera = sceneView.pointOfView else {
+               return
+            }
+        spherelNode.position = camera.position
 
+        let targetPosCamera = SCNVector3Make(0, 0, -2)
+        let target = camera.convertPosition(targetPosCamera, to: nil)
+        
          // 上向きの力をかける
-        spherelNode.physicsBody?.applyForce(SCNVector3(3,1.5,-3.0),
+        spherelNode.physicsBody?.applyForce(SCNVector3(5*target.x,5*target.y,5*target.z),
         asImpulse: true)
 
          // ノードの追加

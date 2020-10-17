@@ -9,12 +9,16 @@ import UIKit
 import SceneKit
 import ARKit
 
-class ViewController: UIViewController, ARSCNViewDelegate {
+var collideCount: Int = 0
+
+class ViewController: UIViewController, ARSCNViewDelegate, SCNPhysicsContactDelegate {
 
     @IBOutlet var sceneView: ARSCNView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        sceneView.scene.physicsWorld.contactDelegate = self
         
         // Set the view's delegate
         sceneView.delegate = self
@@ -31,15 +35,31 @@ class ViewController: UIViewController, ARSCNViewDelegate {
 
          // 平面を検出
          let configuration = ARWorldTrackingConfiguration()
-         configuration.planeDetection = .horizontal
+        //すべての平面を検出する
+         configuration.planeDetection = [.horizontal, .vertical]
         
         sceneView.session.run(configuration)
          }
+    
+    //鬼と衝突したらカウントアップ
+    func physicsWorld(_ world: SCNPhysicsWorld, didBegin contact: SCNPhysicsContact) {
+            let nodeA = contact.nodeA
+            let nodeB = contact.nodeB
+            if (nodeA.name == "mato" && nodeB.name == "tama") {
+                collideCount += 1
+                nodeA.removeFromParentNode()
+            } else if (nodeB.name == "mato" && nodeA.name == "tama") {
+                collideCount += 1
+                nodeB.removeFromParentNode()
+            }
+        print(collideCount)
+        }
 
          // 球を追加する
     func addSphere(hitResult: ARHitTestResult) {
          // ノードの生成
          let spherelNode = SCNNode()
+        spherelNode.name = "tama"
 
          // Geometryと Transform の設定
          let sphereGeometry = SCNSphere(radius: 0.03);
@@ -57,6 +77,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
          spherelNode.physicsBody?.damping = 0.5
          spherelNode.physicsBody?.angularDamping = 0.5
          spherelNode.physicsBody?.isAffectedByGravity = true
+         spherelNode.physicsBody?.categoryBitMask = 1
         
         
         guard let camera = sceneView.pointOfView else {
@@ -79,6 +100,8 @@ class ViewController: UIViewController, ARSCNViewDelegate {
           //平面が検出されたときに呼ばれる
     func renderer(_ renderer: SCNSceneRenderer, didAdd node: SCNNode,
         for anchor: ARAnchor) {
+        
+        
          guard let planeAnchor = anchor as? ARPlaneAnchor else
         {fatalError()}
 
@@ -108,6 +131,23 @@ class ViewController: UIViewController, ARSCNViewDelegate {
 
          // 検出したアンカーに対応するノードに子ノードとして持たせる
          node.addChildNode(planeNode)
+        
+        
+        ///ここ鬼にしてみよう
+        let node = SCNNode() // ノードを生成
+        node.geometry = SCNBox(width: 0.5, height: 0.5, length: 0.5, chamferRadius: 0) // 一片が10cmのキューブ
+        node.name = "mato"
+        let material = SCNMaterial() // マテリアル（表面）を生成する
+        // 表面の色は、ランダムで指定する
+        node.geometry?.materials = [material] // 表面の情報をノードに適用
+
+        node.position = SCNVector3(0, 0, -1.5) // ノードの位置は、原点から左右：0m 上下：0m　奥に50cmとする
+        node.physicsBody = SCNPhysicsBody(type: .dynamic, shape: nil)
+        node.physicsBody?.isAffectedByGravity = false
+        node.physicsBody?.categoryBitMask = 2
+        node.physicsBody?.collisionBitMask = 1
+        node.physicsBody?.contactTestBitMask = 1
+        sceneView.scene.rootNode.addChildNode(node) // 生成したノードをシーンに追加する
     }
 
          // 平面が更新されたときに呼ばれる
@@ -135,11 +175,10 @@ class ViewController: UIViewController, ARSCNViewDelegate {
 
      // スクリーン座標に変換する
      let touchPos = touch.location(in: sceneView)
-        print(touchPos)
 
      // 検出した平面との当たり判定
      let hitTestResult = sceneView.hitTest(touchPos, types:.existingPlane)
-     print(hitTestResult)
+     
      if !hitTestResult.isEmpty {
      if let hitResult = hitTestResult.first {
      // 平面とあたっていたら球を追加する

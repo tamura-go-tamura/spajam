@@ -24,6 +24,7 @@
 		B79E8749253AD07900935B89 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		B79E874C253AD07900935B89 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		B79E874E253AD07900935B89 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		D65DE8DD253B9ADC00F96DA2 /* button04a.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = button04a.mp3; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -56,6 +57,7 @@
 		B79E873F253AD07800935B89 /* testAR */ = {
 			isa = PBXGroup;
 			children = (
+				D65DE8DD253B9ADC00F96DA2 /* button04a.mp3 */,
 				B79E8740253AD07800935B89 /* AppDelegate.swift */,
 				B79E8742253AD07800935B89 /* art.scnassets */,
 				B79E8744253AD07800935B89 /* ViewController.swift */,
